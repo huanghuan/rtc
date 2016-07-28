@@ -56,6 +56,9 @@ $('#join').click(function() {
 	connected(roomId);
 	connection.join(roomId);
 });
+$('#leave').click(function() {
+	connection.leave();
+});
 $('#qrcode').click(function() {
 	$(this).replaceWith('<img src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=' + encodeURI(window.location) + '">');
 });
