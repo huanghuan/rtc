@@ -22,9 +22,8 @@
 <div id='d2'>
 <button id='leave'>离开会议</button>
 <button id='share'>分享桌面</button>
-<select id='resolution'><option>960x720</option><option>640x480</option><option>320x240</option></select>
-<span id='link'></span>
 <button id='qrcode'>二维码</button>
+<select id='resolution'><option>960x720</option><option>640x480</option><option>320x240</option><option>160x120</option></select>
 </div>
 <hr>
 <script>
@@ -49,7 +48,6 @@ if (hash) {
 $('#open').click(function() {
 	var roomId = Math.random() * 1000000 | 0;
 	connected(roomId);
-	$('#link').text('会议链接：' + window.location);
 	connection.open(roomId);
 });
 $('#join').click(function() {
@@ -61,8 +59,17 @@ $('#leave').click(function() {
 	connection.leave();
 });
 $('#resolution').change(function() {
-	var v = $('#resolution').val();
-	alert(v);
+	var v = $('#resolution').val(), i = v.indexOf('x'), w = parseInt(v.substring(0, i)), h = parseInt(v.substring(i + 1));
+	if(connection.DetectRTC.browser.name === 'Chrome') {
+		changeResolutionsInChrome(w, h);
+		return;
+	}
+	connection.applyConstraints({
+		video: {
+			width: w,
+			height: h
+		}
+	});
 });
 $('#qrcode').click(function() {
 	$(this).replaceWith('<img src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=' + encodeURI(window.location) + '">');
@@ -87,6 +94,41 @@ screen.check();
 $('#share').click(function() {
 	screen.share();
 });
+
+function changeResolutionsInChrome(width, height) {
+	if(document.getElementById(connection.userid)) {
+		document.getElementById(connection.userid).style.display = 'none';
+	}
+	connection.mediaConstraints.video.mandatory = {
+		maxWidth: width,
+		maxHeight: height
+	};
+	connection.getAllParticipants().forEach(function(p) {
+		var user = connection.peers[p];
+		user.peer.getLocalStreams().forEach(function(localStream) {
+			user.peer.removeStream(localStream);
+		});
+	});
+	var oldStream = connection.attachStreams[0];
+	navigator.webkitGetUserMedia(connection.mediaConstraints, function(newStream) {
+		connection.attachStreams = [newStream];
+		var video = document.createElement('video');
+		video.src = URL.createObjectURL(newStream);
+		connection.videosContainer.appendChild(video);
+		video.play();
+		setTimeout(function() {
+			video.play();
+			oldStream.stop();
+			setTimeout(function() {
+				video.id = connection.userid;
+				document.getElementById('btn-change-resolutions').disabled = false;
+			}, 2000);
+		}, 5000);
+		connection.renegotiate();
+	}, function(error) {
+		alert(JSON.stringify(error, null, '\t'));
+	});
+}
 </script>
 </body>
 </html>
