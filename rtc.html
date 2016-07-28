@@ -22,6 +22,7 @@
 <div id='d2'>
 <button id='leave'>离开会议</button>
 <button id='share'>分享桌面</button>
+<select id='resolution'><option>960x720</option><option>640x480</option><option>320x240</option></select>
 <span id='link'></span>
 <button id='qrcode'>二维码</button>
 </div>
@@ -58,6 +59,10 @@ $('#join').click(function() {
 });
 $('#leave').click(function() {
 	connection.leave();
+});
+$('#resolution').change(function() {
+	var v = $('#resolution').val();
+	alert(v);
 });
 $('#qrcode').click(function() {
 	$(this).replaceWith('<img src="https://api.qrserver.com/v1/create-qr-code/?size=128x128&data=' + encodeURI(window.location) + '">');
