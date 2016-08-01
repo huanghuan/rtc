@@ -8,23 +8,57 @@
 <script src='https://cdn.firebase.com/v0/firebase.js'></script>
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
+body {
+	margin: 0;
+}
+#controls {
+	position: fixed;
+	left: 0;
+	top: 0;
+	padding: 20px;
+	z-index: 200;
+}
+#thumbnails {
+	position: fixed;
+	right: 0;
+	top: 0;
+	width: 200px;
+	height: 100%;
+	z-index: 100;
+}
+#thumbnails video {
+	width: 160px;
+	height: 120px;
+	object-fit: contain;
+	margin: 20px;
+}
+.large {
+	position: fixed;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+}
 </style>
 </head>
 <body>
+<div id='controls'>
 <input id='room' placeholder='会议名称'>
 <button id='open'>开始会议</button>
 <button id='join'>加入会议</button>
 <button id='leave'>离开会议</button>
 <button id='share'>分享桌面</button>
 <button id='stop'>停止分享</button>
-<select id='resolution'><option>1280x720</option><option>960x720</option><option>640x480</option><option>320x240</option><option>160x120</option></select>
+<select id='resolution'><option>1280x720</option><option>960x720</option><option>640x480</option><option>640x360</option><option>320x240</option><option>320x180</option></select>
+</div>
+<div id='thumbnails'></div>
 <!--
 <button id='qrcode'>二维码</button>
 $('#qrcode').click(function() {
 	$(this).replaceWith('<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURI(window.location) + '">');
 });
 -->
-<hr>
 <script>
 var connection = new RTCMultiConnection();
 connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
@@ -37,8 +71,16 @@ connection.sdpConstraints.mandatory = {
 	OfferToReceiveVideo: true
 };
 connection.onstream = function(event) {
-	document.body.appendChild( event.mediaElement );
+	addVideo(event.mediaElement);
 };
+
+function addVideo(video) {
+	$('.large').removeClass().appendTo($('#thumbnails'));
+	video.className = 'large';
+	document.body.appendChild(video);
+}
+function removeVideo() {
+}
 
 $('#open').click(function() {
 	connection.open($('#room').val());
@@ -67,7 +109,7 @@ var screen = new Screen('screen-unique-id'); // argument is optional
 
 // on getting local or remote streams
 screen.onaddstream = function(e) {
-	document.body.appendChild(e.video);
+	addVideo(e.video);
 };
 screen.onuserleft = function(userid) {
 	var video = document.getElementById(userid);
@@ -85,10 +127,15 @@ $('#stop').click(function() {
 	screen.leave();
 });
 
+$(document).on('click', '#thumbnails video', function(e) {
+	addVideo(e.target);
+	$('video').each(function(index, item) {
+		item.play();
+	});
+});
+
 function changeResolutionsInChrome(width, height) {
-	if(document.getElementById(connection.userid)) {
-		document.getElementById(connection.userid).style.display = 'none';
-	}
+	$(connection.userid).remove();
 	connection.mediaConstraints.video.mandatory = {
 		maxWidth: width,
 		maxHeight: height
@@ -111,7 +158,6 @@ function changeResolutionsInChrome(width, height) {
 			oldStream.stop();
 			setTimeout(function() {
 				video.id = connection.userid;
-				document.getElementById('btn-change-resolutions').disabled = false;
 			}, 1000);
 		}, 2000);
 		connection.renegotiate();
