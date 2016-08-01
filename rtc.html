@@ -45,11 +45,10 @@ body {
 <body>
 <div id='controls'>
 <input id='room' placeholder='会议名称'>
-<button id='open'>开始会议</button>
-<button id='join'>加入会议</button>
-<button id='leave'>离开会议</button>
-<button id='share'>分享桌面</button>
-<button id='stop'>停止分享</button>
+<button id='openOrJoin'>开始加入会议</button>
+<button id='leave'>结束离开会议</button>
+<button id='shareScreen'>分享屏幕</button>
+<button id='leaveScreen'>结束分享</button>
 <select id='resolution'><option>1280x720</option><option>960x720</option><option>640x480</option><option>640x360</option><option>320x240</option><option>320x180</option></select>
 </div>
 <div id='thumbnails'></div>
@@ -66,6 +65,7 @@ connection.session = {
 	audio: false,
 	video: true
 };
+connection.codecs.video = 'H264';
 connection.sdpConstraints.mandatory = {
 	OfferToReceiveAudio: false,
 	OfferToReceiveVideo: true
@@ -82,15 +82,24 @@ function addVideo(video) {
 function removeVideo() {
 }
 
-$('#open').click(function() {
-	connection.open($('#room').val());
-});
-$('#join').click(function() {
-	connection.join($('#room').val());
-});
-$('#leave').click(function() {
-	connection.leave();
-});
+var buttonHandlers = {
+	openOrJoin: function(e) {
+		var roomId = $('#room').val();
+		if (roomId)
+			connection.openOrJoin(roomId);
+		else
+			alert('请输入会议名称！');
+	},
+	leave: function(e) {
+		connection.leave();
+	},
+	shareScreen: function(e) {
+		screen.share();
+	},
+	leaveScreen: function(e) {
+		screen.leave();
+	},
+}
 $('#resolution').change(function() {
 	var v = $('#resolution').val(), i = v.indexOf('x'), w = parseInt(v.substring(0, i)), h = parseInt(v.substring(i + 1));
 	if(connection.DetectRTC.browser.name === 'Chrome') {
@@ -105,29 +114,19 @@ $('#resolution').change(function() {
 	});
 });
 
-var screen = new Screen('screen-unique-id'); // argument is optional
-
-// on getting local or remote streams
+var screen = new Screen();
 screen.onaddstream = function(e) {
 	addVideo(e.video);
 };
-screen.onuserleft = function(userid) {
-	var video = document.getElementById(userid);
-	if(video) video.parentNode.removeChild(video);
+screen.onuserleft = function(userId) {
+	$(userId).remove();
 };
-
-// check pre-shared screens
-// it is useful to auto-view
-// or search pre-shared screens
 screen.check();
-$('#share').click(function() {
-	screen.share();
-});
-$('#stop').click(function() {
-	screen.leave();
-});
 
-$(document).on('click', '#thumbnails video', function(e) {
+$(document).on('click', 'button', function(e) {
+	var f = buttonHandlers[e.target.id];
+	if (f) f(e);
+}).on('click', '#thumbnails video', function(e) {
 	addVideo(e.target);
 	$('video').each(function(index, item) {
 		item.play();
