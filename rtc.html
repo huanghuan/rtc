@@ -18,7 +18,7 @@ body {
 	padding: 20px;
 	z-index: 200;
 }
-#thumbnails {
+#previews {
 	position: fixed;
 	right: 0;
 	top: 0;
@@ -26,13 +26,13 @@ body {
 	height: 100%;
 	z-index: 100;
 }
-#thumbnails video {
+#previews video {
 	width: 160px;
 	height: 120px;
 	object-fit: contain;
 	margin: 20px;
 }
-.large {
+body>video {
 	position: fixed;
 	left: 0;
 	top: 0;
@@ -45,14 +45,14 @@ body {
 <body>
 <div id='controls'>
 <input id='room' placeholder='会议名称'>
-<button id='openOrJoin'>开始加入会议</button>
-<button id='leave'>结束离开会议</button>
+<button id='openOrJoin'>加入会议</button>
+<button id='leave'>离开会议</button>
 <button id='shareScreen'>分享屏幕</button>
 <button id='leaveScreen'>结束分享</button>
-<select id='resolution'><option>1280x720</option><option>960x720</option><option>640x480</option><option>640x360</option><option>320x240</option><option>320x180</option></select>
 </div>
-<div id='thumbnails'></div>
+<div id='previews'></div>
 <!--
+<select id='resolution'><option>1280x720</option><option>960x720</option><option>640x480</option><option>640x360</option><option>320x240</option><option>320x180</option></select>
 <button id='qrcode'>二维码</button>
 $('#qrcode').click(function() {
 	$(this).replaceWith('<img src="https://api.qrserver.com/v1/create-qr-code/?size=100x100&data=' + encodeURI(window.location) + '">');
@@ -62,24 +62,31 @@ $('#qrcode').click(function() {
 var connection = new RTCMultiConnection();
 connection.socketURL = 'https://rtcmulticonnection.herokuapp.com:443/';
 connection.session = {
-	audio: false,
+	audio: true,
 	video: true
 };
-connection.codecs.video = 'H264';
 connection.sdpConstraints.mandatory = {
-	OfferToReceiveAudio: false,
+	OfferToReceiveAudio: true,
 	OfferToReceiveVideo: true
 };
 connection.onstream = function(event) {
 	addVideo(event.mediaElement);
 };
+connection.onstreamended = function(event) {
+	removeVideo(event.mediaElement);
+};
+connection.onleave = function(e) {
+	$('video').remove();
+	alert(e.entireSessionClosed ? '会议已结束' : '您已离开会议');
+};
 
 function addVideo(video) {
-	$('.large').removeClass().appendTo($('#thumbnails'));
-	video.className = 'large';
+	$('body>video').appendTo($('#previews'));
+	video.controls = false;
 	document.body.appendChild(video);
 }
-function removeVideo() {
+function removeVideo(video) {
+	$(video).remove();
 }
 
 var buttonHandlers = {
@@ -118,6 +125,9 @@ var screen = new Screen();
 screen.onaddstream = function(e) {
 	addVideo(e.video);
 };
+screen.onstreamended = function(e) {
+	removeVideo(e.video);
+};
 screen.onuserleft = function(userId) {
 	$(userId).remove();
 };
@@ -126,7 +136,7 @@ screen.check();
 $(document).on('click', 'button', function(e) {
 	var f = buttonHandlers[e.target.id];
 	if (f) f(e);
-}).on('click', '#thumbnails video', function(e) {
+}).on('click', '#previews video', function(e) {
 	addVideo(e.target);
 	$('video').each(function(index, item) {
 		item.play();
