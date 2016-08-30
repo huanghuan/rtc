@@ -5,7 +5,12 @@
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
 body {
+	background: #333;
 	margin: 0;
+}
+button {
+	display: none;
+	width: 80px;
 }
 aside {
 	position: fixed;
@@ -16,8 +21,8 @@ aside {
 }
 aside video {
 	width: 160px;
-	height: 120px;
-	object-fit: contain;
+	height: auto;
+	object-fit: cover;
 }
 #remote>video:last-child {
 	position: fixed;
@@ -33,21 +38,30 @@ aside video {
 <body>
 <aside>
 <video id='local'></video>
-<button id='leaveRoom'>离开会议</button>
-<button id='shareScreen'>分享屏幕</button>
-<button id='stopScreenShare'>停止分享</button>
+<button id='joinRoom'>加入会议</button><button id='leaveRoom'>离开会议</button><button id='shareScreen'>分享屏幕</button><button id='stopScreenShare'>停止分享</button>
+<div id='localScreen'></div>
 <div id='remote'></div>
 </aside>
 <script>
 var handlers = {
+	joinRoom: function() {
+		rtc.joinRoom('test');
+		$('#joinRoom').hide();
+		$('#leaveRoom').show();
+		$('#shareScreen').show();
+	},
 	leaveRoom: function() {
 		rtc.leaveRoom();
+		$('button').hide();
+		$('#joinRoom').show();
 	},
 	shareScreen: function() {
 		rtc.shareScreen();
 	},
 	stopScreenShare: function() {
 		if (rtc.getLocalScreen()) rtc.stopScreenShare();
+		$('#shareScreen').show();
+		$('#stopScreenShare').hide();
 	}
 };
 var rtc = new SimpleWebRTC({
@@ -56,11 +70,15 @@ var rtc = new SimpleWebRTC({
 	autoRequestMedia: true
 });
 rtc.on('readyToCall', function() {
-	rtc.joinRoom('test');
+	$('#joinRoom').show();
 }).on('localScreenAdded', function(video) {
-	$('#local').append($(video));
+	$('#localScreen').append($(video));
+	$('#shareScreen').hide();
+	$('#stopScreenShare').show();
 }).on('localScreenRemoved', function(video) {
 	$(video).remove();
+	$('#shareScreen').show();
+	$('#stopScreenShare').hide();
 });
 $(document).on('click', 'button', function(e) {
 	handlers[e.target.id]();
