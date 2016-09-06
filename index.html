@@ -15,6 +15,13 @@ aside {
 body {
 	margin: 0;
 }
+li {
+	line-height: 3;
+}
+ul {
+	margin-top: 96px;
+	opacity: 0.8;
+}
 video {
 	display: block;
 	width: 128px;
@@ -38,6 +45,11 @@ video {
 </style>
 </head>
 <body>
+<ul>
+<li>点击左上角的图标开始共享屏幕（首次使用请先<a href='屏幕共享.zip'>下载并安装浏览器插件</a>）</li>
+<li>点击右上角的任意小窗口将其最大化</li>
+<li>按F11键切换全屏幕模式</li>
+</ul>
 <aside>
 <video id='localVideo'></video>
 </aside>
@@ -54,7 +66,7 @@ $('#shareScreen').click(function() {
 		rtc.shareScreen();
 	} catch (err) {
 		location = '屏幕共享.zip';
-		alert('请先安装屏幕共享浏览器插件');
+		alert('请先下载并安装浏览器插件');
 	}
 });
 rtc.on('readyToCall', function() {
