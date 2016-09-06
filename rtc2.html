@@ -1,88 +1,73 @@
 <html>
 <head>
 <meta charset='UTF-8'>
+<!--
+<script src="simplewebrtc.bundle.js"></script>
+-->
 <script src="https://simplewebrtc.com/latest-v2.js"></script>
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
-body {
-	background: #333;
-	margin: 0;
-}
-button {
-	display: none;
-	width: 80px;
-}
 aside {
 	position: fixed;
-	right: 0;
-	top: 0;
-	width: 160px;
-	margin: 20px;
+	right: 16px;
+	top: 16px;
 }
-aside video {
-	width: 160px;
+body {
+	margin: 0;
+}
+video {
+	display: block;
+	width: 128px;
 	height: auto;
-	object-fit: cover;
 }
-#remote>video:last-child {
+.max {
 	position: fixed;
 	left: 0;
 	top: 0;
 	width: 100%;
 	height: 100%;
-	z-index: -100;
 	object-fit: cover;
+	z-index: -100;
+}
+#shareScreen {
+	position: fixed;
+	left: 16px;
+	top: 16px;
+	width: 64px;
+	height: auto;
+	opacity: 0.5;
 }
 </style>
 </head>
 <body>
 <aside>
-<video id='local'></video>
-<button id='joinRoom'>加入会议</button><button id='leaveRoom'>离开会议</button><button id='shareScreen'>分享屏幕</button><button id='stopScreenShare'>停止分享</button>
-<div id='localScreen'></div>
-<div id='remote'></div>
+<video id='localVideo'></video>
 </aside>
+<img id='shareScreen' src='screens.png' onclick='rtc.shareScreen()' title='共享屏幕'>
 <script>
-var handlers = {
-	joinRoom: function() {
-		rtc.joinRoom('test');
-		$('#joinRoom').hide();
-		$('#leaveRoom').show();
-		$('#shareScreen').show();
-	},
-	leaveRoom: function() {
-		rtc.leaveRoom();
-		$('button').hide();
-		$('#joinRoom').show();
-	},
-	shareScreen: function() {
-		rtc.shareScreen();
-	},
-	stopScreenShare: function() {
-		if (rtc.getLocalScreen()) rtc.stopScreenShare();
-		$('#shareScreen').show();
-		$('#stopScreenShare').hide();
-	}
-};
+var aside = document.getElementsByTagName('aside')[0];
 var rtc = new SimpleWebRTC({
-	localVideoEl: 'local',
-	remoteVideosEl: 'remote',
-	autoRequestMedia: true
+	autoRemoveVideos: false,
+	autoRequestMedia: true,
+	localVideoEl: 'localVideo'
 });
 rtc.on('readyToCall', function() {
-	$('#joinRoom').show();
+	rtc.joinRoom('79');
+}).on('videoAdded', function(video) {
+	aside.appendChild(video);
+}).on('videoRemoved', function(video) {
+	aside.removeChild(video);
 }).on('localScreenAdded', function(video) {
-	$('#localScreen').append($(video));
 	$('#shareScreen').hide();
-	$('#stopScreenShare').show();
-}).on('localScreenRemoved', function(video) {
-	$(video).remove();
+	aside.appendChild(video);
+}).on('localScreenStopped', function(video) {
 	$('#shareScreen').show();
-	$('#stopScreenShare').hide();
 });
-$(document).on('click', 'button', function(e) {
-	handlers[e.target.id]();
+$(document).on('click', 'video', function(e) {
+	$('.max').removeClass('max');
+	$(e.target).addClass('max');
 });
+document.documentElement.webkitRequestFullScreen();
 </script>
 </body>
 </html>
