@@ -33,7 +33,7 @@ video {
 	position: fixed;
 	left: 16px;
 	top: 16px;
-	opacity: 0.5;
+	opacity: 0.6;
 }
 </style>
 </head>
@@ -50,10 +50,12 @@ var rtc = new SimpleWebRTC({
 	localVideoEl: 'localVideo'
 });
 $('#shareScreen').click(function() {
-	if (!rtc.capabilities.screenSharing) {
-		location = 'ScreenSharing.crx';
+	try {
+		rtc.shareScreen();
+	} catch (err) {
+		location = '屏幕共享.zip';
+		alert('请先安装屏幕共享浏览器插件');
 	}
-	rtc.shareScreen();
 });
 rtc.on('readyToCall', function() {
 	rtc.joinRoom('79');
