@@ -33,8 +33,6 @@ video {
 	position: fixed;
 	left: 16px;
 	top: 16px;
-	width: 64px;
-	height: auto;
 	opacity: 0.5;
 }
 </style>
@@ -43,13 +41,19 @@ video {
 <aside>
 <video id='localVideo'></video>
 </aside>
-<img id='shareScreen' src='screens.png' onclick='rtc.shareScreen()' title='共享屏幕'>
+<img id='shareScreen' src='screens.png' title='共享屏幕'>
 <script>
 var aside = document.getElementsByTagName('aside')[0];
 var rtc = new SimpleWebRTC({
 	autoRemoveVideos: false,
 	autoRequestMedia: true,
 	localVideoEl: 'localVideo'
+});
+$('#shareScreen').click(function() {
+	if (!rtc.capabilities.screenSharing) {
+		location = 'ScreenSharing.crx';
+	}
+	rtc.shareScreen();
 });
 rtc.on('readyToCall', function() {
 	rtc.joinRoom('79');
@@ -67,7 +71,6 @@ $(document).on('click', 'video', function(e) {
 	$('.max').removeClass('max');
 	$(e.target).addClass('max');
 });
-document.documentElement.webkitRequestFullScreen();
 </script>
 </body>
 </html>
