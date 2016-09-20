@@ -1,5 +1,6 @@
 <html>
 <head>
+<meta name='viewport' content='width=device-width,initial-scale=1,user-scalable=0'>
 <meta charset='UTF-8'>
 <script src='https://simplewebrtc.com/latest-v2.js'></script>
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
@@ -34,12 +35,52 @@ video {
 	top: 16px;
 	opacity: 0.6;
 }
+#conversation {
+	position: fixed;
+	left: -25%;
+	top: 0;
+	bottom: 0;
+	width: 25%;
+	opacity: 0;
+	background: #fff;
+	border-right: 4px solid #eee;
+	padding: 8px;
+	transition: all 0.5s;
+}
+#conversation.show {
+	left: 0;
+	opacity: 1;
+}
+#conversation footer {
+	position: absolute;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	background: #eee;
+	-border-top: 1px solid #ddd;
+	padding: 4px;
+	display: flex;
+}
+footer img {
+	flex: 0 0;
+	margin: 1px 0 1px 5px;
+	vertical-align: middle;
+}
+input {
+	border: 0;
+	flex: 1 1;
+	padding: 8px;
+}
 </style>
 </head>
 <body title='按F11键切换全屏'>
 <aside>
 <video id='localVideo'></video>
 </aside>
+<div id='conversation'><footer><input>
+<img src='text.png'>
+<img src='file.png'>
+<img src='cancel.png'></footer></div>
 <img id='shareScreen' src='screens.png' title='共享屏幕'>
 <script>
 var aside = document.getElementsByTagName('aside')[0];
@@ -55,6 +96,7 @@ $('#shareScreen').click(function() {
 		if (confirm('请先下载并安装浏览器插件'))
 			location = '屏幕共享.zip';
 	}
+	$('#conversation').toggleClass('show');
 });
 rtc.on('readyToCall', function() {
 	rtc.joinRoom('79');
