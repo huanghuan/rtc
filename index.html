@@ -5,15 +5,15 @@
 <script src='https://simplewebrtc.com/latest-v2.js'></script>
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
-aside {
+body {
+	margin: 0;
+	background: #06c url(bg.svg) no-repeat center;
+	background-size: contain;
+}
+#videos {
 	position: fixed;
 	right: 16px;
 	top: 16px;
-}
-body {
-	margin: 0;
-	background: #07c url(bg.svg) no-repeat center;
-	background-size: contain;
 }
 video {
 	display: block;
@@ -29,61 +29,107 @@ video {
 	object-fit: cover;
 	z-index: -100;
 }
-#shareScreen {
+header {
 	position: fixed;
-	left: 16px;
+	left: 0;
 	top: 16px;
-	opacity: 0.6;
+	opacity: 0.8;
+	transition: all 0.5s;
 }
-#conversation {
+header.min {
+	left: -96px;
+}
+header.min svg:not(:last-child) {
+	opacity: 0;
+}
+header.min svg:last-child {
+	transform: scaleX(-1);
+}
+svg {
+	fill: none;
+	stroke-width: 4px;
+	margin-left: 16px;
+	transition: all 0.5s;
+	width: 32px;
+	height: 32px;
+}
+header svg {
+	stroke: #fff;
+}
+footer svg {
+	stroke: #36c;
+	vertical-align: middle;
+}
+#shareScreen {
+}
+aside {
+	background: #fff;
+	display: flex;
+	flex-direction: column;
+	opacity: 1;
+	transition: all 0.5s;
 	position: fixed;
-	left: -25%;
+	left: 0;
 	top: 0;
 	bottom: 0;
 	width: 25%;
+}
+aside.min {
+	left: -25%;
 	opacity: 0;
-	background: #fff;
+}
+#messages {
 	border-right: 4px solid #eee;
+	flex: 1 1;
 	padding: 8px;
-	transition: all 0.5s;
 }
-#conversation.show {
-	left: 0;
-	opacity: 1;
-}
-#conversation footer {
-	position: absolute;
-	left: 0;
-	right: 0;
-	bottom: 0;
+footer {
 	background: #eee;
-	-border-top: 1px solid #ddd;
-	padding: 4px;
 	display: flex;
+	flex: 0 0 auto;
+	padding: 4px;
 }
-footer img {
-	flex: 0 0;
-	margin: 1px 0 1px 5px;
-	vertical-align: middle;
-}
-input {
+#text {
 	border: 0;
 	flex: 1 1;
 	padding: 8px;
 }
+#file {
+	display: none;
+}
 </style>
 </head>
 <body title='按F11键切换全屏'>
-<aside>
+<div id='videos'>
 <video id='localVideo'></video>
-</aside>
-<div id='conversation'><footer><input>
-<img src='text.png'>
-<img src='file.png'>
-<img src='cancel.png'></footer></div>
-<img id='shareScreen' src='screens.png' title='共享屏幕'>
+</div>
+<header><svg viewBox="0 0 64 64" onclick='$("#text").focus();$("aside").removeClass("min");'>
+	<polygon points="32,46 62,46 62,6 2,6 2,46 17,46 17,62"/>
+</svg><svg id='shareScreen' viewBox="0 0 64 64">
+	<rect x="2" y="6" width="60" height="40"/>
+	<line x1="2" y1="38" x2="62" y2="38"/>
+	<line x1="32" y1="46" x2="32" y2="62"/>
+	<line x1="17" y1="62" x2="47" y2="62"/>
+</svg><svg viewBox="0 0 64 64" title='Show/hide toolbar' onclick='$("header").toggleClass("min")'>
+	<polyline points="32,8 8,32 32,56"/>
+	<line x1="8" y1="32" x2="56" y2="32"/>
+</svg></header>
+<aside class='min'><div id='messages'>
+</div><footer><input id='text' type='text'><input id='file' type='file'>
+<svg viewBox="0 0 64 64" title='发送消息' onclick=''>
+	<polygon points="32,46 62,46 62,6 2,6 2,46 17,46 17,62"/>
+</svg>
+<svg viewBox="0 0 64 64" title='发送文件' onclick='$("#file").click()'>
+	<polygon points="24,2 56,2 56,62 8,62 8,18"/>
+	<polyline points="8,18 24,18 24,2"/>
+</svg>
+<svg viewBox="0 0 64 64" title='隐藏消息窗口' onclick='$("aside").addClass("min")'>
+	<polyline points="32,8 8,32 32,56"/>
+	<line x1="8" y1="32" x2="56" y2="32"/>
+</svg>
+</footer></aside>
 <script>
-var aside = document.getElementsByTagName('aside')[0];
+var videos = document.getElementsByTagName('videos')[0];
 var rtc = new SimpleWebRTC({
 	autoRemoveVideos: false,
 	autoRequestMedia: true,
@@ -96,18 +142,17 @@ $('#shareScreen').click(function() {
 		if (confirm('请先下载并安装浏览器插件'))
 			location = '屏幕共享.zip';
 	}
-	$('#conversation').toggleClass('show');
 });
 rtc.on('readyToCall', function() {
 	rtc.joinRoom('79');
 }).on('videoAdded', function(video) {
-	aside.appendChild(video);
+	videos.appendChild(video);
 	$(video).click();
 }).on('videoRemoved', function(video) {
-	aside.removeChild(video);
+	videos.removeChild(video);
 }).on('localScreenAdded', function(video) {
 	$('#shareScreen').hide();
-	aside.appendChild(video);
+	videos.appendChild(video);
 }).on('localScreenStopped', function(video) {
 	$('#shareScreen').show();
 });
