@@ -37,7 +37,7 @@ header {
 	transition: all 0.5s;
 }
 header.min {
-	left: -96px;
+	left: -192px;
 }
 header.min svg:not(:last-child) {
 	opacity: 0;
@@ -57,7 +57,7 @@ header svg {
 	stroke: #fff;
 }
 footer svg {
-	stroke: #36c;
+	stroke: #333;
 	vertical-align: middle;
 }
 #shareScreen {
@@ -104,38 +104,60 @@ footer {
 <video id='localVideo'></video>
 </div>
 <header><svg viewBox="0 0 64 64" onclick='$("#text").focus();$("aside").removeClass("min");'>
-	<polygon points="32,46 62,46 62,6 2,6 2,46 17,46 17,62"/>
-</svg><svg id='shareScreen' viewBox="0 0 64 64">
-	<rect x="2" y="6" width="60" height="40"/>
-	<line x1="2" y1="38" x2="62" y2="38"/>
-	<line x1="32" y1="46" x2="32" y2="62"/>
+	<polygon points="32,47 62,47 62,7 2,7 2,47 17,47 17,62"/>
+</svg><svg id='shareScreen' viewBox="0 0 64 64"><title>共享屏幕</title>
+	<rect x="2" y="7" width="60" height="40"/>
+	<line x1="32" y1="47" x2="32" y2="62"/>
 	<line x1="17" y1="62" x2="47" y2="62"/>
+</svg><svg viewBox="0 0 64 64">
+  <path d="m22,12a10,10 0 0 1 20,0l0,20a10,10 0 0 1 -20,0z"/>
+  <path d="m12,32a20,20 0 0 0 40,0"/>
+  <line x1="32" y1="52" x2="32" y2="62"/>
+</svg><svg viewBox="0 0 64 64">
+	<rect x="2" y="12" width="40" height="40"/>
+	<polyline points="42,22 62,12 62,52 42,42"/>
 </svg><svg viewBox="0 0 64 64" title='Show/hide toolbar' onclick='$("header").toggleClass("min")'>
-	<polyline points="32,8 8,32 32,56"/>
-	<line x1="8" y1="32" x2="56" y2="32"/>
+	<polyline points="32,7 7,32 32,57"/>
+	<line x1="7" y1="32" x2="57" y2="32"/>
 </svg></header>
 <aside class='min'><div id='messages'>
 </div><footer><input id='text' type='text'><input id='file' type='file'>
-<svg viewBox="0 0 64 64" title='发送消息' onclick=''>
-	<polygon points="32,46 62,46 62,6 2,6 2,46 17,46 17,62"/>
+<svg viewBox="0 0 64 64" title='发送消息' id='sendText'>
+	<polygon points="32,47 62,47 62,7 2,7 2,47 17,47 17,62"/>
 </svg>
-<svg viewBox="0 0 64 64" title='发送文件' onclick='$("#file").click()'>
-	<polygon points="24,2 56,2 56,62 8,62 8,18"/>
-	<polyline points="8,18 24,18 24,2"/>
+<svg viewBox="0 0 64 64" title='发送文件' id='sendFile'>
+	<polygon points="27,2 57,2 57,62 7,62 7,22"/>
+	<polyline points="27,2 27,22 7,22"/>
 </svg>
 <svg viewBox="0 0 64 64" title='隐藏消息窗口' onclick='$("aside").addClass("min")'>
-	<polyline points="32,8 8,32 32,56"/>
-	<line x1="8" y1="32" x2="56" y2="32"/>
+	<polyline points="32,7 7,32 32,57"/>
+	<line x1="7" y1="32" x2="57" y2="32"/>
 </svg>
 </footer></aside>
 <script>
-var videos = document.getElementsByTagName('videos')[0];
+var videos = document.querySelector('#videos');
 var rtc = new SimpleWebRTC({
 	autoRemoveVideos: false,
 	autoRequestMedia: true,
 	localVideoEl: 'localVideo'
 });
 $('#shareScreen').click(function() {
+	try {
+		rtc.shareScreen();
+	} catch (err) {
+		if (confirm('请先下载并安装浏览器插件'))
+			location = '屏幕共享.zip';
+	}
+});
+$('#sendText').click(function() {
+	try {
+		rtc.shareScreen();
+	} catch (err) {
+		if (confirm('请先下载并安装浏览器插件'))
+			location = '屏幕共享.zip';
+	}
+});
+$('#sendFile').click(function() {
 	try {
 		rtc.shareScreen();
 	} catch (err) {
@@ -156,10 +178,36 @@ rtc.on('readyToCall', function() {
 }).on('localScreenStopped', function(video) {
 	$('#shareScreen').show();
 });
+rtc.connection.on('message', function(e) {
+	if (e.type == 'text') {
+		$('#messages').append(`<p>${e.payload}</p>`);
+		$('aside').removeClass('min');
+	}
+});
 $(document).on('click', 'video', function(e) {
 	$('.max').removeClass('max');
 	$(e.target).addClass('max');
 });
+$(document).on('click', 'svg', function(e) {
+	var id = e.target.id;
+	if (id && handlers[id])
+		handlers[id]();
+});
+var handlers = {
+	sendText() {
+		var t = $('#text')[0], s = t.value;
+		if (s.length) {
+			rtc.sendToAll('text', s);
+			t.value = '';
+		}
+		else {
+			t.focus();
+		}
+	},
+	sendFile() {
+		$("#file").click();
+	}
+}
 </script>
 </body>
 </html>
