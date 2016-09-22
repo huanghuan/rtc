@@ -26,8 +26,10 @@ video {
 	top: 0;
 	width: 100%;
 	height: 100%;
-	object-fit: cover;
 	z-index: -100;
+}
+.cover .max {
+	object-fit: cover;
 }
 header {
 	position: fixed;
@@ -37,12 +39,12 @@ header {
 	transition: all 0.5s;
 }
 header.min {
-	left: -192px;
+	left: -144px;
 }
-header.min svg:not(:last-child) {
+header.min>span:not(:last-child)>svg {
 	opacity: 0;
 }
-header.min svg:last-child {
+header.min>span:last-child>svg {
 	transform: scaleX(-1);
 }
 svg {
@@ -78,61 +80,74 @@ aside.min {
 	left: -25%;
 	opacity: 0;
 }
-#messages {
+#comments {
 	border-right: 4px solid #eee;
 	flex: 1 1;
-	padding: 8px;
+	overflow: auto;
 }
 footer {
 	background: #eee;
 	display: flex;
-	flex: 0 0 auto;
-	padding: 4px;
+	padding: 8px;
 }
 #text {
 	border: 0;
-	flex: 1 1;
+	width: 100%;
 	padding: 8px;
 }
 #file {
 	display: none;
 }
+.comment {
+	color: #333;
+	margin: 16px 16px 32px 16px;
+	min-height: 48px;
+	padding-left: 48px;
+	position: relative;
+}
+.comment span {
+	color: #06c;
+}
+.comment img:first-child {
+	position: absolute;
+	left: 0;
+}
+time {
+	color: #ccc;
+	float: right;
+}
 </style>
 </head>
-<body title='按F11键切换全屏'>
+<body class='cover'>
 <div id='videos'>
 <video id='localVideo'></video>
 </div>
-<header><svg viewBox="0 0 64 64" onclick='$("#text").focus();$("aside").removeClass("min");'>
-	<polygon points="32,47 62,47 62,7 2,7 2,47 17,47 17,62"/>
-</svg><svg id='shareScreen' viewBox="0 0 64 64"><title>共享屏幕</title>
-	<rect x="2" y="7" width="60" height="40"/>
-	<line x1="32" y1="47" x2="32" y2="62"/>
-	<line x1="17" y1="62" x2="47" y2="62"/>
-</svg><svg viewBox="0 0 64 64">
-  <path d="m22,12a10,10 0 0 1 20,0l0,20a10,10 0 0 1 -20,0z"/>
-  <path d="m12,32a20,20 0 0 0 40,0"/>
-  <line x1="32" y1="52" x2="32" y2="62"/>
-</svg><svg viewBox="0 0 64 64">
-	<rect x="2" y="12" width="40" height="40"/>
-	<polyline points="42,22 62,12 62,52 42,42"/>
-</svg><svg viewBox="0 0 64 64" title='Show/hide toolbar' onclick='$("header").toggleClass("min")'>
-	<polyline points="32,7 7,32 32,57"/>
-	<line x1="7" y1="32" x2="57" y2="32"/>
-</svg></header>
-<aside class='min'><div id='messages'>
+<header><span title='显示消息'><svg viewBox='0 0 64 64' onclick='$("#text").focus();$("aside").removeClass("min");'>
+	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
+</svg></span><span title='共享屏幕'><svg id='shareScreen' viewBox='0 0 64 64'>
+	<rect x='2' y='7' width='60' height='40'/>
+	<line x1='32' y1='47' x2='32' y2='62'/>
+	<line x1='17' y1='62' x2='47' y2='62'/>
+</svg></span><span title='按F11键切换全屏'><svg viewBox='0 0 64 64' onclick='$("body").toggleClass("cover")'>
+	<path d='m7,22v-15h15m20,0h15v15m0,20v15h-15m-20,0h-15v-15'/>
+	<path d='M22,22l-15,-15M42,22l15,-15M42,42l15,15M22,42l-15,15'/>
+</svg></span><span title='工具栏'><svg viewBox='0 0 64 64' onclick='$("header").toggleClass("min")'>
+	<polyline points='32,7 7,32 32,57'/>
+	<line x1='7' y1='32' x2='57' y2='32'/>
+</svg></span></header>
+<aside class='min'><div id='comments'>
 </div><footer><input id='text' type='text'><input id='file' type='file'>
-<svg viewBox="0 0 64 64" title='发送消息' id='sendText'>
-	<polygon points="32,47 62,47 62,7 2,7 2,47 17,47 17,62"/>
-</svg>
-<svg viewBox="0 0 64 64" title='发送文件' id='sendFile'>
-	<polygon points="27,2 57,2 57,62 7,62 7,22"/>
-	<polyline points="27,2 27,22 7,22"/>
-</svg>
-<svg viewBox="0 0 64 64" title='隐藏消息窗口' onclick='$("aside").addClass("min")'>
-	<polyline points="32,7 7,32 32,57"/>
-	<line x1="7" y1="32" x2="57" y2="32"/>
-</svg>
+<span title='发送消息'><svg viewBox='0 0 64 64' id='sendText'>
+	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
+</svg></span>
+<span title='发送文件'><svg viewBox='0 0 64 64' id='sendFile'>
+	<polygon points='27,2 57,2 57,62 7,62 7,22'/>
+	<polyline points='27,2 27,22 7,22'/>
+</svg></span>
+<span title='隐藏消息'><svg viewBox='0 0 64 64' onclick='$("aside").addClass("min")'>
+	<polyline points='32,7 7,32 32,57'/>
+	<line x1='7' y1='32' x2='57' y2='32'/>
+</svg></span>
 </footer></aside>
 <script>
 var videos = document.querySelector('#videos');
@@ -140,30 +155,6 @@ var rtc = new SimpleWebRTC({
 	autoRemoveVideos: false,
 	autoRequestMedia: true,
 	localVideoEl: 'localVideo'
-});
-$('#shareScreen').click(function() {
-	try {
-		rtc.shareScreen();
-	} catch (err) {
-		if (confirm('请先下载并安装浏览器插件'))
-			location = '屏幕共享.zip';
-	}
-});
-$('#sendText').click(function() {
-	try {
-		rtc.shareScreen();
-	} catch (err) {
-		if (confirm('请先下载并安装浏览器插件'))
-			location = '屏幕共享.zip';
-	}
-});
-$('#sendFile').click(function() {
-	try {
-		rtc.shareScreen();
-	} catch (err) {
-		if (confirm('请先下载并安装浏览器插件'))
-			location = '屏幕共享.zip';
-	}
 });
 rtc.on('readyToCall', function() {
 	rtc.joinRoom('79');
@@ -180,7 +171,7 @@ rtc.on('readyToCall', function() {
 });
 rtc.connection.on('message', function(e) {
 	if (e.type == 'text') {
-		$('#messages').append(`<p>${e.payload}</p>`);
+		appendMsg(e.from, e.payload);
 		$('aside').removeClass('min');
 	}
 });
@@ -194,19 +185,34 @@ $(document).on('click', 'svg', function(e) {
 		handlers[id]();
 });
 var handlers = {
+	shareScreen() {
+		try {
+			rtc.shareScreen();
+		} catch (err) {
+			if (confirm('请先下载并安装浏览器插件'))
+				location = '屏幕共享.zip';
+		}
+	},
 	sendText() {
 		var t = $('#text')[0], s = t.value;
 		if (s.length) {
 			rtc.sendToAll('text', s);
+			appendMsg(null, s);
 			t.value = '';
 		}
-		else {
-			t.focus();
-		}
+		t.focus();
 	},
 	sendFile() {
 		$("#file").click();
 	}
+}
+function appendMsg(nick, text) {
+	var c = $('#comments'), d = new Date();
+	if (nick)
+		c.append(`<div class='comment'><img src='female.png'><span>${nick}</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`);
+	else
+		c.append(`<div class='comment'><img src='male.png'><span>You</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`);
+	c.scrollTop(c.height());
 }
 </script>
 </body>
