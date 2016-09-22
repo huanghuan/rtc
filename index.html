@@ -136,7 +136,7 @@ time {
 	<line x1='7' y1='32' x2='57' y2='32'/>
 </svg></span></header>
 <aside class='min'><div id='comments'>
-</div><footer><input id='text' type='text'><input id='file' type='file'>
+</div><footer><input id='text'><input id='file' type='file'>
 <span title='发送消息'><svg viewBox='0 0 64 64' id='sendText'>
 	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
 </svg></span>
@@ -178,11 +178,14 @@ rtc.connection.on('message', function(e) {
 $(document).on('click', 'video', function(e) {
 	$('.max').removeClass('max');
 	$(e.target).addClass('max');
-});
-$(document).on('click', 'svg', function(e) {
+}).on('click', 'svg', function(e) {
 	var id = e.target.id;
 	if (id && handlers[id])
 		handlers[id]();
+});
+$('#text').on('keydown', e => {
+	if (e.keyCode == 13)
+		$('#sendText').click();
 });
 var handlers = {
 	shareScreen() {
@@ -212,7 +215,7 @@ function appendMsg(nick, text) {
 		c.append(`<div class='comment'><img src='female.png'><span>${nick}</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`);
 	else
 		c.append(`<div class='comment'><img src='male.png'><span>You</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`);
-	c.scrollTop(c.height());
+	c.scrollTop(c[0].scrollHeight);
 }
 </script>
 </body>
