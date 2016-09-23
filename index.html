@@ -41,10 +41,10 @@ header {
 header.min {
 	left: -144px;
 }
-header.min>span:not(:last-child)>svg {
+header.min>a:not(:last-child)>svg {
 	opacity: 0;
 }
-header.min>span:last-child>svg {
+header.min>a:last-child>svg {
 	transform: scaleX(-1);
 }
 svg {
@@ -57,6 +57,7 @@ svg {
 }
 header svg {
 	stroke: #fff;
+	-webkit-filter: drop-shadow(0 0 1px #999);
 }
 footer svg {
 	stroke: #333;
@@ -122,32 +123,32 @@ time {
 <div id='videos'>
 <video id='localVideo'></video>
 </div>
-<header><span title='显示消息'><svg viewBox='0 0 64 64' onclick='$("#text").focus();$("aside").removeClass("min");'>
+<header><a title='显示消息'><svg viewBox='0 0 64 64' onclick='$("#text").focus();$("aside").removeClass("min");'>
 	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
-</svg></span><span title='共享屏幕'><svg id='shareScreen' viewBox='0 0 64 64'>
+</svg></a><a title='共享屏幕'><svg id='shareScreen' viewBox='0 0 64 64'>
 	<rect x='2' y='7' width='60' height='40'/>
 	<line x1='32' y1='47' x2='32' y2='62'/>
 	<line x1='17' y1='62' x2='47' y2='62'/>
-</svg></span><span title='按F11键切换全屏'><svg viewBox='0 0 64 64' onclick='$("body").toggleClass("cover")'>
+</svg></a><a title='按F11键切换全屏'><svg viewBox='0 0 64 64' onclick='$("body").toggleClass("cover")'>
 	<path d='m7,22v-15h15m20,0h15v15m0,20v15h-15m-20,0h-15v-15'/>
 	<path d='M22,22l-15,-15M42,22l15,-15M42,42l15,15M22,42l-15,15'/>
-</svg></span><span title='工具栏'><svg viewBox='0 0 64 64' onclick='$("header").toggleClass("min")'>
+</svg></a><a title='工具栏'><svg viewBox='0 0 64 64' onclick='$("header").toggleClass("min")'>
 	<polyline points='32,7 7,32 32,57'/>
 	<line x1='7' y1='32' x2='57' y2='32'/>
-</svg></span></header>
-<aside class='min'><div id='comments'>
-</div><footer><input id='text'><input id='file' type='file'>
-<span title='发送消息'><svg viewBox='0 0 64 64' id='sendText'>
+</svg></a></header>
+<aside class='min'><div id='comments'></div>
+<footer><input id='text'><input id='file' type='file'>
+<a title='发送消息'><svg viewBox='0 0 64 64' id='sendText'>
 	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
-</svg></span>
-<span title='发送文件'><svg viewBox='0 0 64 64' id='sendFile'>
+</svg></a>
+<a title='发送文件'><svg viewBox='0 0 64 64' id='sendFile'>
 	<polygon points='27,2 57,2 57,62 7,62 7,22'/>
 	<polyline points='27,2 27,22 7,22'/>
-</svg></span>
-<span title='隐藏消息'><svg viewBox='0 0 64 64' onclick='$("aside").addClass("min")'>
+</svg></a>
+<a title='隐藏消息'><svg viewBox='0 0 64 64' onclick='$("aside").addClass("min")'>
 	<polyline points='32,7 7,32 32,57'/>
 	<line x1='7' y1='32' x2='57' y2='32'/>
-</svg></span>
+</svg></a>
 </footer></aside>
 <script>
 var videos = document.querySelector('#videos');
@@ -156,29 +157,26 @@ var rtc = new SimpleWebRTC({
 	autoRequestMedia: true,
 	localVideoEl: 'localVideo'
 });
-rtc.on('readyToCall', function() {
+rtc.on('readyToCall', () => {
 	rtc.joinRoom('79');
-}).on('videoAdded', function(video) {
+}).on('videoAdded', video => {
 	videos.appendChild(video);
 	$(video).click();
-}).on('videoRemoved', function(video) {
+}).on('videoRemoved', video => {
 	videos.removeChild(video);
-}).on('localScreenAdded', function(video) {
-	$('#shareScreen').hide();
+}).on('localScreenAdded', video => {
 	videos.appendChild(video);
-}).on('localScreenStopped', function(video) {
-	$('#shareScreen').show();
 });
-rtc.connection.on('message', function(e) {
+rtc.connection.on('message', e => {
 	if (e.type == 'text') {
 		appendMsg(e.from, e.payload);
 		$('aside').removeClass('min');
 	}
 });
-$(document).on('click', 'video', function(e) {
+$(document).on('click', 'video', e => {
 	$('.max').removeClass('max');
 	$(e.target).addClass('max');
-}).on('click', 'svg', function(e) {
+}).on('click', 'svg', e => {
 	var id = e.target.id;
 	if (id && handlers[id])
 		handlers[id]();
@@ -189,6 +187,10 @@ $('#text').on('keydown', e => {
 });
 var handlers = {
 	shareScreen() {
+		if (rtc.getLocalScreen()) {
+			rtc.stopScreenShare();
+			return;
+		}
 		try {
 			rtc.shareScreen();
 		} catch (err) {
