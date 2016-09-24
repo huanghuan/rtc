@@ -6,6 +6,7 @@
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
 a {
+	display: inline-block;
 	margin-left: 16px;
 }
 body {
@@ -54,17 +55,16 @@ header.min>a:last-child>svg {
 svg {
 	fill: none;
 	stroke-width: 4px;
-	transition: all 0.5s;
 	width: 32px;
 	height: 32px;
 }
 header svg {
 	stroke: #fff;
+	transition: all 0.5s;
 	-webkit-filter: drop-shadow(0 0 1px #999);
 }
 footer svg {
 	stroke: #333;
-	vertical-align: middle;
 }
 aside {
 	background: #fff;
@@ -90,15 +90,14 @@ aside.min {
 		left: -100%;
 	}
 }
-#comments {
-	border-right: 4px solid #eee;
-	flex: 1 1;
-	overflow: auto;
-}
 footer {
 	background: #eee;
 	display: flex;
 	padding: 4px;
+}
+footer a {
+	flex: 0 0 auto;
+	vertical-align: middle;
 }
 #text {
 	border: 0;
@@ -108,6 +107,11 @@ footer {
 #file {
 	display: none;
 }
+#comments {
+	border-right: 4px solid #eee;
+	flex: 1 1;
+	overflow: auto;
+}
 .comment {
 	color: #333;
 	margin: 16px 16px 32px 16px;
@@ -115,12 +119,12 @@ footer {
 	padding-left: 48px;
 	position: relative;
 }
-.comment span {
-	color: #06c;
-}
 .comment img:first-child {
 	position: absolute;
 	left: 0;
+}
+.comment span {
+	color: #06c;
 }
 time {
 	color: #ccc;
