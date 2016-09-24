@@ -6,9 +6,9 @@
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
 body {
-	margin: 0;
 	background: #06c url(bg.svg) no-repeat center;
 	background-size: contain;
+	margin: 0;
 }
 #videos {
 	position: fixed;
@@ -17,6 +17,7 @@ body {
 }
 video {
 	display: block;
+	object-fit: cover;
 	width: 128px;
 	height: auto;
 }
@@ -28,8 +29,8 @@ video {
 	height: 100%;
 	z-index: -100;
 }
-.cover .max {
-	object-fit: cover;
+.contain .max {
+	object-fit: contain;
 }
 header {
 	position: fixed;
@@ -72,18 +73,20 @@ aside {
 	position: fixed;
 	left: 0;
 	top: 0;
-	bottom: 0;
 	width: 25%;
-}
-@media screen and (orientation:portrait) {
-	aside {
-		bottom: 50%;
-		width: 100%;
-	}
+	height: 100%;
 }
 aside.min {
 	left: -25%;
 	opacity: 0;
+}
+@media screen and (max-width:800px) {
+	aside {
+		width: 100%;
+	}
+	aside.min {
+		left: -100%;
+	}
 }
 #comments {
 	border-right: 4px solid #eee;
@@ -123,7 +126,7 @@ time {
 }
 </style>
 </head>
-<body class='cover'>
+<body>
 <div id='videos'>
 <video id='localVideo'></video>
 </div>
@@ -133,7 +136,7 @@ time {
 	<rect x='2' y='7' width='60' height='40'/>
 	<line x1='32' y1='47' x2='32' y2='62'/>
 	<line x1='17' y1='62' x2='47' y2='62'/>
-</svg></a><a title='按F11键切换全屏' onclick='$("body").toggleClass("cover")'><svg viewBox='0 0 64 64'>
+</svg></a><a title='按F11键切换全屏' onclick='$("body").toggleClass("contain")'><svg viewBox='0 0 64 64'>
 	<path d='m7,22v-15h15m20,0h15v15m0,20v15h-15m-20,0h-15v-15'/>
 	<path d='M22,22l-15,-15M42,22l15,-15M42,42l15,15M22,42l-15,15'/>
 </svg></a><a title='隐藏（显示）工具' onclick='$("header").toggleClass("min")'><svg viewBox='0 0 64 64'>
@@ -178,7 +181,7 @@ rtc.connection.on('message', e => {
 		$('aside').removeClass('min');
 	}
 });
-$('video').on('click', e => {
+$(document).on('click', 'video', e => {
 	$('.max').removeClass('max');
 	$(e.target).addClass('max');
 });
