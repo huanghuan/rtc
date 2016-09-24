@@ -5,6 +5,9 @@
 <script src='https://simplewebrtc.com/latest-v2.js'></script>
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
+a {
+	margin-left: 16px;
+}
 body {
 	background: #06c url(bg.svg) no-repeat center;
 	background-size: contain;
@@ -51,7 +54,6 @@ header.min>a:last-child>svg {
 svg {
 	fill: none;
 	stroke-width: 4px;
-	margin-left: 16px;
 	transition: all 0.5s;
 	width: 32px;
 	height: 32px;
@@ -96,7 +98,7 @@ aside.min {
 footer {
 	background: #eee;
 	display: flex;
-	padding: 8px;
+	padding: 4px;
 }
 #text {
 	border: 0;
@@ -221,7 +223,7 @@ listen('click', {
 });
 function appendMsg(nick, text) {
 	var c = $('#comments'), d = new Date();
-	c.append(`<div class='comment'><img src='male.png'><span>${nick}</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`).scrollTop(c[0].scrollHeight);
+	c.append("<div class='comment'><img src='male.png'><span>" + nick + "</span><time>" + d.getHours() + ":" + d.getMinutes() + "</time><div>" + text + "</div></div>").scrollTop(c[0].scrollHeight);
 }
 </script>
 </body>
