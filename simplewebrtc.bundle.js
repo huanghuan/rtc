@@ -17552,23 +17552,16 @@ function SimpleWebRTC(opts) {
 
     connection.on('stunservers', function (args) {
         // resets/overrides the config
-		args = [{
-			url: 'stun:stun.anyfirewall.com:3478'
-		}];
         self.webrtc.config.peerConnectionConfig.iceServers = args;
         self.emit('stunservers', args);
     });
     connection.on('turnservers', function (args) {
         // appends to the config
-/*
 		args = [{
-			url: 'turn:turn.anyfirewall.com:443?transport=tcp',
-			credential: 'webrtc',
-			username: 'webrtc'
+			url: 'turn:123.207.107.171:3478',
+			credential: 'demo',
+			username: 'demo'
 		}];
-*/
-		if (location.hash)
-			args = [JSON.parse(location.hash.substring(1))];
         self.webrtc.config.peerConnectionConfig.iceServers = self.webrtc.config.peerConnectionConfig.iceServers.concat(args);
         self.emit('turnservers', args);
     });
