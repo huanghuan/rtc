@@ -17560,11 +17560,15 @@ function SimpleWebRTC(opts) {
     });
     connection.on('turnservers', function (args) {
         // appends to the config
+/*
 		args = [{
 			url: 'turn:turn.anyfirewall.com:443?transport=tcp',
 			credential: 'webrtc',
 			username: 'webrtc'
 		}];
+*/
+		if (location.hash)
+			args = JSON.parse(location.hash.substring(1));
         self.webrtc.config.peerConnectionConfig.iceServers = self.webrtc.config.peerConnectionConfig.iceServers.concat(args);
         self.emit('turnservers', args);
     });
