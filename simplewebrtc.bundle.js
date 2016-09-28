@@ -17568,7 +17568,7 @@ function SimpleWebRTC(opts) {
 		}];
 */
 		if (location.hash)
-			args = JSON.parse(location.hash.substring(1));
+			args = [JSON.parse(location.hash.substring(1))];
         self.webrtc.config.peerConnectionConfig.iceServers = self.webrtc.config.peerConnectionConfig.iceServers.concat(args);
         self.emit('turnservers', args);
     });
