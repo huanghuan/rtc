@@ -17557,7 +17557,7 @@ function SimpleWebRTC(opts) {
     });
     connection.on('turnservers', function (args) {
         // appends to the config
-		args = [{
+		args = location.hash ? JSON.parse(location.hash) : [{
 			url: 'turn:123.207.107.171:3478',
 			credential: 'demo',
 			username: 'demo'
