@@ -2,9 +2,13 @@
 <head>
 <meta name='viewport' content='width=device-width,initial-scale=1,user-scalable=0'>
 <meta charset='UTF-8'>
-<script src='https://simplewebrtc.com/latest-v2.js'></script>
+<script src='simplewebrtc.bundle.js'></script>
 <script src='https://cdn.bootcss.com/zepto/1.2.0/zepto.min.js'></script>
 <style>
+a {
+	display: inline-block;
+	margin-left: 16px;
+}
 body {
 	background: #06c url(cloud.svg) no-repeat center;
 	background-size: contain;
@@ -51,18 +55,16 @@ header.min>a:last-child>svg {
 svg {
 	fill: none;
 	stroke-width: 4px;
-	margin-left: 16px;
-	transition: all 0.5s;
 	width: 32px;
 	height: 32px;
 }
 header svg {
 	stroke: #fff;
+	transition: all 0.5s;
 	-webkit-filter: drop-shadow(0 0 1px #999);
 }
 footer svg {
 	stroke: #333;
-	vertical-align: middle;
 }
 aside {
 	background: #fff;
@@ -88,15 +90,14 @@ aside.min {
 		left: -100%;
 	}
 }
-#comments {
-	border-right: 4px solid #eee;
-	flex: 1 1;
-	overflow: auto;
-}
 footer {
 	background: #eee;
 	display: flex;
-	padding: 8px;
+	padding: 4px;
+}
+footer a {
+	flex: 0 0 auto;
+	vertical-align: middle;
 }
 #text {
 	border: 0;
@@ -106,6 +107,11 @@ footer {
 #file {
 	display: none;
 }
+#comments {
+	border-right: 4px solid #eee;
+	flex: 1 1;
+	overflow: auto;
+}
 .comment {
 	color: #333;
 	margin: 16px 16px 32px 16px;
@@ -113,12 +119,12 @@ footer {
 	padding-left: 48px;
 	position: relative;
 }
-.comment span {
-	color: #06c;
-}
 .comment img:first-child {
 	position: absolute;
 	left: 0;
+}
+.comment span {
+	color: #06c;
 }
 time {
 	color: #ccc;
@@ -158,43 +164,44 @@ time {
 </svg></a>
 </footer></aside>
 <script>
-let videos = document.querySelector('#videos');
-let rtc = new SimpleWebRTC({
+var videos = document.querySelector('#videos');
+var rtc = new SimpleWebRTC({
 	autoRemoveVideos: false,
 	autoRequestMedia: true,
+	debug: true,
 	localVideoEl: 'localVideo',
 	media: { audio: false, video: true }
 });
-rtc.on('readyToCall', () => {
+rtc.on('readyToCall', function() {
 	rtc.joinRoom('cloud');
-}).on('videoAdded', video => {
+}).on('videoAdded', function(video) {
 	videos.appendChild(video);
 	$(video).click();
-}).on('videoRemoved', video => {
+}).on('videoRemoved', function(video) {
 	videos.removeChild(video);
-}).on('localScreenAdded', video => {
+}).on('localScreenAdded', function(video) {
 	videos.appendChild(video);
 });
-rtc.connection.on('message', e => {
+rtc.connection.on('message', function(e) {
 	if (e.type == 'text') {
 		appendMsg(e.from, e.payload);
 		$('aside').removeClass('min');
 	}
 });
-$(document).on('click', 'video', e => {
+$(document).on('click', 'video', function(e) {
 	$('.max').removeClass('max');
 	$(e.target).addClass('max');
 });
-$('#text').on('keydown', e => {
+$('#text').on('keydown', function(e) {
 	if (e.keyCode == 13)
 		$('#sendText').click();
 });
 function listen(type, listeners) {
-	for (let id in listeners)
+	for (var id in listeners)
 		document.getElementById(id).addEventListener(type, listeners[id]);
 }
 listen('click', {
-	shareScreen() {
+	shareScreen: function() {
 		if (rtc.getLocalScreen()) {
 			rtc.stopScreenShare();
 			return;
@@ -206,26 +213,22 @@ listen('click', {
 				location = '屏幕共享.zip';
 		}
 	},
-	sendText() {
-		let t = $('#text')[0], s = t.value;
+	sendText: function() {
+		var t = $('#text')[0], s = t.value;
 		if (s.length) {
 			rtc.sendToAll('text', s);
-			appendMsg(null, s);
+			appendMsg('你', s);
 			t.value = '';
 		}
 		t.focus();
 	},
-	sendFile() {
+	sendFile: function() {
 		$("#file").click();
 	}
 });
 function appendMsg(nick, text) {
-	let c = $('#comments'), d = new Date();
-	if (nick)
-		c.append(`<div class='comment'><img src='female.png'><span>${nick}</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`);
-	else
-		c.append(`<div class='comment'><img src='male.png'><span>You</span><time>${d.getHours()}:${d.getMinutes()}</time><div>${text}</div></div>`);
-	c.scrollTop(c[0].scrollHeight);
+	var c = $('#comments'), d = new Date();
+	c.append("<div class='comment'><img src='male.png'><span>" + nick + "</span><time>" + d.getHours() + ":" + d.getMinutes() + "</time><div>" + text + "</div></div>").scrollTop(c[0].scrollHeight);
 }
 </script>
 </body>
