@@ -10,7 +10,7 @@ a {
 	margin-left: 16px;
 }
 body {
-	background: #06c url(bg.svg) no-repeat center;
+	background: #06c url(loading.svg) no-repeat center;
 	background-size: contain;
 	margin: 0;
 }
@@ -97,7 +97,6 @@ footer {
 }
 footer a {
 	flex: 0 0 auto;
-	vertical-align: middle;
 }
 #text {
 	border: 0;
@@ -107,23 +106,23 @@ footer a {
 #file {
 	display: none;
 }
-#comments {
+#messages {
 	border-right: 4px solid #eee;
-	flex: 1 1;
+	flex: 1 1 auto;
 	overflow: auto;
 }
-.comment {
+.message {
 	color: #333;
 	margin: 16px 16px 32px 16px;
 	min-height: 48px;
 	padding-left: 48px;
 	position: relative;
 }
-.comment img:first-child {
+.message img:first-child {
 	position: absolute;
 	left: 0;
 }
-.comment span {
+.message span {
 	color: #06c;
 }
 time {
@@ -149,7 +148,7 @@ time {
 	<polyline points='32,7 7,32 32,57'/>
 	<line x1='7' y1='32' x2='57' y2='32'/>
 </svg></a></header>
-<aside class='min'><div id='comments'></div>
+<aside class='min'><div id='messages'></div>
 <footer><input id='text'><input id='file' type='file'>
 <a title='发送消息' id='sendText'><svg viewBox='0 0 64 64'>
 	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
@@ -168,8 +167,7 @@ var videos = document.querySelector('#videos');
 var rtc = new SimpleWebRTC({
 	autoRemoveVideos: false,
 	autoRequestMedia: true,
-	localVideoEl: 'localVideo',
-	media: { audio: false, video: true }
+	localVideoEl: 'localVideo'
 });
 rtc.on('readyToCall', function() {
 	rtc.joinRoom('79');
@@ -226,8 +224,8 @@ listen('click', {
 	}
 });
 function appendMsg(nick, text) {
-	var c = $('#comments'), d = new Date();
-	c.append("<div class='comment'><img src='male.png'><span>" + nick + "</span><time>" + d.getHours() + ":" + d.getMinutes() + "</time><div>" + text + "</div></div>").scrollTop(c[0].scrollHeight);
+	var c = $('#messages'), d = new Date();
+	c.append("<div class='message'><img src='male.png'><span>" + nick + "</span><time>" + d.getHours() + ":" + d.getMinutes() + "</time><div>" + text + "</div></div>").scrollTop(c[0].scrollHeight);
 }
 </script>
 </body>
