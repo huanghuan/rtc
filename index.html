@@ -10,7 +10,7 @@ a {
 	margin-left: 16px;
 }
 body {
-	background: #06c url(loading.svg) no-repeat center;
+	background: #06c url(bg.svg) no-repeat center;
 	background-size: contain;
 	margin: 0;
 }
@@ -37,19 +37,21 @@ video {
 	object-fit: contain;
 }
 header {
+	opacity: 0.8;
 	position: fixed;
 	left: 0;
-	top: 16px;
-	opacity: 0.8;
+	top: 0;
+}
+header>a {
+	display: block;
+	margin: 16px;
 	transition: all 0.5s;
 }
-header.min {
-	left: -144px;
-}
-header.min>a:not(:last-child)>svg {
+header.min>a:not(:first-child) {
+	margin-left: -16px;
 	opacity: 0;
 }
-header.min>a:last-child>svg {
+header.min>a:first-child {
 	transform: scaleX(-1);
 }
 svg {
@@ -60,7 +62,6 @@ svg {
 }
 header svg {
 	stroke: #fff;
-	transition: all 0.5s;
 	-webkit-filter: drop-shadow(0 0 1px #999);
 }
 footer svg {
@@ -135,7 +136,10 @@ time {
 <div id='videos'>
 <video id='localVideo'></video>
 </div>
-<header><a title='显示消息' onclick='$("#text").focus();$("aside").removeClass("min");'><svg viewBox='0 0 64 64'>
+<header><a title='隐藏（显示）工具' onclick='$("header").toggleClass("min")'><svg viewBox='0 0 64 64'>
+	<polyline points='32,7 7,32 32,57'/>
+	<line x1='7' y1='32' x2='57' y2='32'/>
+</svg></a><a title='显示消息' onclick='$("#text").focus();$("aside").removeClass("min");'><svg viewBox='0 0 64 64'>
 	<polygon points='32,47 62,47 62,7 2,7 2,47 17,47 17,62'/>
 </svg></a><a title='共享屏幕' id='shareScreen'><svg viewBox='0 0 64 64'>
 	<rect x='2' y='7' width='60' height='40'/>
@@ -144,9 +148,6 @@ time {
 </svg></a><a title='按F11键切换全屏' onclick='$("body").toggleClass("contain")'><svg viewBox='0 0 64 64'>
 	<path d='m7,22v-15h15m20,0h15v15m0,20v15h-15m-20,0h-15v-15'/>
 	<path d='M22,22l-15,-15M42,22l15,-15M42,42l15,15M22,42l-15,15'/>
-</svg></a><a title='隐藏（显示）工具' onclick='$("header").toggleClass("min")'><svg viewBox='0 0 64 64'>
-	<polyline points='32,7 7,32 32,57'/>
-	<line x1='7' y1='32' x2='57' y2='32'/>
 </svg></a></header>
 <aside class='min'><div id='messages'></div>
 <footer><input id='text'><input id='file' type='file'>
